@@ -51,6 +51,7 @@ import {ConfigHelper} from "./util/config-helper";
 import Create = DocumentsAction.Create;
 import UpdateData = DocumentsAction.UpdateData;
 import {AfterViewInit} from "@angular/core/src/metadata/lifecycle_hooks";
+import { PostItConfigModel } from '../../../core/store/views/view.model';
 
 @Component({
   selector: 'post-it-perspective',
@@ -171,7 +172,7 @@ export class PostItPerspectiveComponent implements OnInit, AfterViewInit, OnDest
   }
 
   private createConfigHelper() {
-    this.configHelper = new ConfigHelper(this.store);
+    this.configHelper = new ConfigHelper(this.store, (config) => this.updateUsingConfig(config));
     this.configHelper.initialize();
   }
 
@@ -208,6 +209,15 @@ export class PostItPerspectiveComponent implements OnInit, AfterViewInit, OnDest
     return this.collectionRoles && Object.keys(this.collectionRoles) || []
   }
 
+  public updateUsingConfig(config: PostItConfigModel) {
+    // this.get...
+    // this.order...
+  }
+
+  public updateViewOrder() {
+    this.configHelper.changeDocumentOrder(this.postIts);
+  }
+
   private loadMoreOnInfiniteScroll(): void {
     if (!this.allLoaded && this.navigationHelper && this.navigationHelper.validNavigation()) {
       this.getPostIts();
@@ -219,7 +229,8 @@ export class PostItPerspectiveComponent implements OnInit, AfterViewInit, OnDest
 
     this.fetchQueryDocuments(this.navigationHelper.queryForFetched(this.page));
     this.subscribeOnDocuments(this.navigationHelper.queryForSubscription(this.page));
-
+    this.configHelper.increaseDocumentCount(this.navigationHelper.queryForFetched(this.page).pageSize);
+    
     this.page++;
   }
 

@@ -43,7 +43,8 @@ export interface ViewConfigModel {
 
 export interface PostItConfigModel {
 
-  documentIdsOrder?: string[];
+  documentOrder: {[id: string]: number};
+  loadedDocuments: number;
 
 }
 

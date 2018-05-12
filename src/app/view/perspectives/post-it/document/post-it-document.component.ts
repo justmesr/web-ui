@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild, OnChanges} from '@angular/core';
 
 import {Store} from '@ngrx/store';
 import {isString} from 'util';
@@ -47,10 +47,9 @@ export class PostItDocumentComponent implements OnInit {
     if (this.shouldSuggestDeletion()) {
       this.confirmDeletion();
       this.changed = false;
-      return;
     }
 
-    if (this.changed) {
+    else if (this.changed) {
       this.checkforDuplicitAttributes();
 
       this.changed = false;

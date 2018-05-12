@@ -22,6 +22,9 @@ import {Subscription} from 'rxjs/Subscription';
 import {AppState} from '../../../../core/store/app.state';
 import {PostItConfigModel} from '../../../../core/store/views/view.model';
 import {selectViewPostItConfig} from '../../../../core/store/views/views.state';
+import {ViewsAction} from '../../../../core/store/views/views.action';
+import { filter } from 'rxjs/operators/filter';
+import { PostItDocumentModel } from '../document-data/post-it-document-model';
 
 export class ConfigHelper {
 
@@ -29,13 +32,40 @@ export class ConfigHelper {
 
   private subscription: Subscription;
 
-  constructor(private store: Store<AppState>) {
+  constructor(private store: Store<AppState>, private updateState: (config) => void) {
   }
 
   public initialize(): void {
-    this.subscription = this.store.select(selectViewPostItConfig).subscribe((postItConfig: PostItConfigModel) => {
-      this.postItConfig = postItConfig;
-    });
+    this.subscription = this.store.select(selectViewPostItConfig)
+      .pipe(
+        filter(config => config && config !== this.postItConfig)
+      )
+      .subscribe((postItConfig: PostItConfigModel) => {
+        this.postItConfig = postItConfig;
+        this.updateState(postItConfig);
+      });
+
+    this.postItConfig = {
+      documentOrder: {},
+      loadedDocuments: 0
+    };
+  }
+
+  public increaseDocumentCount(newDocumentCount: number) {
+    this.postItConfig.loadedDocuments = newDocumentCount;
+    this.updateConfig();
+  }
+
+  public changeDocumentOrder(postIts: PostItDocumentModel[]) {
+    this.postItConfig.documentOrder = postIts
+      .filter(postIt => postIt.document.id)
+      .reduce((result, current) => result[current.document.id] = current.order, {});
+
+    this.updateConfig();
+  }
+
+  private updateConfig() {
+    this.store.dispatch(new ViewsAction.ChangePostItConfig({config: this.postItConfig}));
   }
 
   public unsubscribe(): void {

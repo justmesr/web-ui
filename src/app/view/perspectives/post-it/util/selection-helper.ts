@@ -89,7 +89,7 @@ export class SelectionHelper {
 
   private selectNextToTheRight(): void {
     if (this.selection.row === this.lastRow()) {
-      this.moveSelection(Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER);
+      this.moveSelection(1, -Number.MAX_SAFE_INTEGER);
     } else {
       this.moveSelection(1, 0);
     }
@@ -156,6 +156,7 @@ export class SelectionHelper {
         this.tryToSelectDocumentOnRight(newColumn, newRow);
         break;
       case Direction.Up:
+        newRow = this.lastRow();
         this.tryToSelectDocumentOnUp(newColumn, newRow);
         break;
       case Direction.Down:
@@ -193,11 +194,11 @@ export class SelectionHelper {
 
   private selectRow(row: number): void {
     if (row < 0) {
-      row = this.lastRow();
+      row = 0;
     }
 
     if (row > this.lastRow()) {
-      row = 0;
+      row = this.lastRow();
     }
 
     this.selection.row = row;
